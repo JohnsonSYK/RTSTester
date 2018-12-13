@@ -12,8 +12,11 @@ There are a lot of RTS tools available, RTS Tester integrate two most popular RT
 1. **Ekstazi**: State-of-the-art dynamic class-level RTS tool.  
 http://ekstazi.org/  
 <img width = "200" alt="ekstazi" src = "https://user-images.githubusercontent.com/16890520/49922646-ef594080-fe76-11e8-88ad-cb85db260ad8.png">
+
 2. **STARTS**: Static class-level RTS tool.  
 https://github.com/TestingResearchIllinois/starts  
+
+
 ## Getting Started  
   
 These instructions will get you a copy of the RTS Tester up and running on your local machine for development and testing purposes.   
@@ -68,8 +71,10 @@ public static void main(String[] args) throws ... {
     runRTS();
  }  
 ```  
-There is the default test flow for RTS Tester, if you want to customize your test flow, go next session:
+Here is the default test flow for RTS Tester, if you want to customize your test flow, go next session:
 <img width="809" alt="capture" src="https://user-images.githubusercontent.com/16890520/49922648-eff1d700-fe76-11e8-9c2e-fda7ab778c42.PNG">
+
+
 ## Customize Tests  
   
 * **Methods:**  
@@ -77,7 +82,7 @@ Typically we use the following functions to run RTS tools on selected project.
 ```  
 runRTS();  
 ```  
-If the user want to customize test flow, he/she can write their own test in main function, the main functions are: (able to run in any order)  
+If the user wants to customize test flow, he/she can write their own test in main function, the main functions are: (able to run in any order)  
 1. ```readCSV()```: read .csv files to import tests, return List of ```buildInfo``` Object, default format in csv is:  
 ```  
 project name, build id, event type, previous SHA, current SHA  
@@ -135,7 +140,7 @@ testAndLogResult(path);
 
 You can checkout some of the test results using this tool [here](https://github.com/JohnsonSYK/RTSTester/blob/master/Results.MD).
 
-## Testing Pipeline:
+## Integration in Development Cycle:
 Developers could integrate RTS Tester to achieve following part to better test their build before deployment: 
 <img width="799" alt="capture2" src="https://user-images.githubusercontent.com/16890520/49922647-ef594080-fe76-11e8-8aa1-e999e6c6e946.PNG">
 
