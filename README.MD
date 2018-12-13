@@ -7,7 +7,14 @@
   
 When developers maintain a software, they often create test suite on main functionalities and periodically regression test their build on test suite to make sure their changes do not produce errors. The simplest regression testing strategy, *retest all*, reruns every test case in the test suite. However this strategy can be very expensive as the scale of test suite and software grows. Here comes another approach, *regression test selection (RTS)*, reruns only a subset of the initial test suite. Studies show that a good selection tool could significantly reduce the testing time through skipping tests that are unaffected by the changes developers made.   
   
-There are a lot of RTS tools available, RTS Tester integrate two most popular RTS tools and let developer easily experiment their project with RTS tools over hundreds of builds. RTS Tester also provide environment to let developer customize their own testing flow. Including integration of *Evosuite* and *Randoop*, two unit test generation tools for maven projects.  
+There are a lot of RTS tools available, but there is no easy tool for integrate and evaluate RTS tools yet. RTS Tester integrate two most popular RTS tools and let developer easily experiment their project with RTS tools over hundreds of builds. RTS Tester also provide environment to let developer customize their own testing flow. Including integration of *Evosuite* and *Randoop*, two unit test generation tools for maven projects.  
+
+### Main features:  
+* Integrate Regression test selection tools into maven projects.
+* Evaluate Regression test selection tools with customizable test flow.
+* Perform Unit test generation.
+
+
 ### RTS Tools used:  
 1. **Ekstazi**: State-of-the-art dynamic class-level RTS tool.  
 http://ekstazi.org/  
@@ -38,9 +45,9 @@ Things you need to prepare before using RTS Tester.
   
 ```  
 1. A github open source project you want to test.
-2. Java JDK 8.  
+2. Java SE 8.  
 3. IDE (Optional but recommended Intellij)  
-```  
+```
 Note: RTS Tester works on both single and multi module maven projects. However, projects that require specific configuration to compile may not work properly.  
   
 ### Installing  
@@ -190,4 +197,18 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 --->  
 ## Acknowledgments  
   
-* Professor Darko Marinov's suggestion throughout the project.  
+* Many Thanks to Professor Darko Marinov's suggestion throughout the project.  
+
+## Further Reading
+* [An Empirical Study of Regression Test Selection Techniques](https://www.cs.umd.edu/~aporter/Docs/p184-graves.pdf)
+```
+T. Graves, M.J. Harrold, J.-M. Kim, A. Porter, and G.Rothermel. 
+Proceedings of the 20th International Conference on Software Engineering
+pages 188-197, Apr. 1998. 
+```
+* [The Effect of Test Suite Type on Regression Test Selection](http://users.ece.utexas.edu/~gligoric/papers/DiniETAL16EffectOfTestSuiteOnRTS.pdf)
+```
+N. Dini, A. Sullivan, M. Gligoric, and G. Rothermel. 
+Software Reliability Engineering (ISSRE), 2016 IEEE 27th International
+pages 47–58. IEEE, 2016.
+```
