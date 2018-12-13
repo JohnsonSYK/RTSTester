@@ -1,7 +1,6 @@
 package edu.illinois.yukangs2;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -13,16 +12,13 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import static edu.illinois.yukangs2.RTSUtils.*;
-
 public class RTSTester{
     private static int evaluationNum;
     private static String repoURL;
-    private final static String domain = "https://github.com/";
     //https://github.com/kevinsawicki/http-request.git
     //https://github.com/JodaOrg/joda-time.git
 
-    public static void main(String[] args) throws IOException, InterruptedException, XmlPullParserException, TimeoutException {
+    public static void main(String[] args) throws IOException, InterruptedException, XmlPullParserException {
         if (args.length != 2){
             System.out.println("Usage: RTSTester.java <num of evaluation> <repo url>");
             System.exit(0);
@@ -35,53 +31,10 @@ public class RTSTester{
 
     }
 
-    static void runEval(BuildInfo build, PrintWriter pw) throws IOException, InterruptedException, XmlPullParserException {
-        System.out.println("On repo: " + build.repoName + ", time: " + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
-        //String name = "temp";
-        String name = build.repoName.split("/")[1];
-        runComm("rm -rf " + name);
-        File parent = createDir(name);
-        String dir = "./"+name;
-        runComm("git clone " + domain+build.repoName+".git" + " " + dir);
-        runComm("git checkout " + build.preSHA, parent);
-        TestResult pre = patchAndTest(dir, true);
-        runComm("git checkout .", parent);
-        runComm("git checkout " + build.curSHA, parent);
-        TestResult cur = patchAndTest(dir, true);
-        System.out.println("Testing Build " + build.buildID + " and select " +cur.testRun +" tests out of " + pre.testRun + " tests.");
-        pw.println(build.repoName+","+build.preSHA+","+build.curSHA+","+pre.testRun+","+cur.testRun);
-        pw.flush();
-        //Moving files
-        try {
-            FileUtils.copyDirectory(new File("./"+name+"/.ekstazi"), new File("./saved/"+name+"/.ekstazi"));
-            FileUtils.copyFile(new File("./log.txt"), new File("./saved/"+name+"/log.txt"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        runComm("rm -rf " + name);
-        runComm("rm log.txt");
-    }
-        /*
-        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("out.csv", true)));
-
-        System.out.println("On repo: SonarSource/sonarqube");
-        String name = "temp";
-        runComm("rm -rf " + name);
-        File parent = createDir(name);
-        String dir = "./temp";
-        runComm("git clone " + domain+"SonarSource/sonarqube.git" + " " + dir);
-        runComm("git checkout " + "10d02b48362808b6f109d41f5a29380778f919b8", parent);
-        TestResult pre = patchAndTest(dir, true);
-        runComm("git checkout .", parent);
-        runComm("git checkout " + "ff3a016e7896ead2a5387c88c152032097b7b475", parent);
-        TestResult res = patchAndTest(dir, true);
-        System.out.println("Testing Build " + 73345909 + " and select " +res.testRun +" tests out of " + pre.testRun + " tests.");
-        pw.println(pre.testRun+","+res.testRun);
-        //runComm("rm -rf " + name);
-        pw.flush();
-        */
-
+    /**
+     * Default test flow for RTS Tester
+     * @throws IOException, InterruptedException, XmlPullParserException
+     */
     private static void runRTS() throws IOException, InterruptedException, XmlPullParserException {
         /*
             1. create temp dir, move into temp
@@ -143,6 +96,13 @@ public class RTSTester{
 
     }
 
+    /**
+     * Parse the list of past SHAs/hashes for the repo
+     * @param num: Number of evaluation tested
+     * @param dir: main directory of maven configuration
+     * @return List of String
+     * @throws IOException .
+     */
     static List<String> getHashes(int num, String dir) throws IOException {
         ProcessBuilder pb = new ProcessBuilder("git", "--git-dir="+dir+"/.git", "log", "-" + num, "--format=\"%H\"");
         Process p = pb.start();
@@ -157,6 +117,14 @@ public class RTSTester{
         return hashes;
     }
 
+
+    /**
+     * Group functions together for patching and testing
+     * @param dir: main directory of maven configuration
+     * @param isEkstazi: True use Ekstazi, False use STARTS
+     * @return TestResult Object for storing test number, and runtime
+     * @throws IOException, XmlPullParserException, InterruptedException
+     */
     static TestResult patchAndTest(String dir, boolean isEkstazi) throws IOException, XmlPullParserException, InterruptedException {
         if (isMultiModule(dir))
             addParent(dir);
@@ -168,18 +136,33 @@ public class RTSTester{
         return testAndLogResult(dir);
     }
 
+    /**
+     * Run bash script commands in current directory
+     * @param com: String of bash command
+     * @throws IOException, InterruptedException
+     */
     static void runComm(String com) throws IOException, InterruptedException {
         Runtime rt = Runtime.getRuntime();
         Process pr = rt.exec(com);
         pr.waitFor();
     }
 
+    /**
+     * Run bash script commands in specified directory
+     * @param com: String of bash command
+     * @throws IOException, InterruptedException
+     */
     static void runComm(String com, File dir) throws InterruptedException, IOException {
         Runtime rt = Runtime.getRuntime();
         Process pr = rt.exec(com, null, dir);
         pr.waitFor();
     }
 
+    /**
+     * Create empty directory/folder in current directory with name
+     * @param name: folder name
+     * @return File of the new folder
+     */
     static File createDir(String name){
         File dir = new File(name);
         if (!dir.mkdir()) {
@@ -189,6 +172,11 @@ public class RTSTester{
         return dir;
     }
 
+    /**
+     * Create empty directory/folder in specified directory with name
+     * @param name: folder name
+     * @return File of the new folder
+     */
     private static File createDir(File parent, String name){
         File dir = new File(parent, name);
         if (!dir.mkdir()) {
@@ -198,7 +186,6 @@ public class RTSTester{
         return dir;
     }
 
-    //https://stackoverflow.com/questions/2811536/how-to-edit-a-maven-pom-at-runtime
     /*
       <plugin>
         <groupId>org.ekstazi</groupId>
@@ -214,7 +201,13 @@ public class RTSTester{
         </executions>
       </plugin>
     */
+    /**
+     * Patch Ekstazi dependencies in configuration file(pom.xml)
+     * @param dir: main directory of maven configuration file
+     * @throws IOException, XmlPullParserException
+     */
     static void patchEkstazi(String dir) throws IOException, XmlPullParserException {
+        //Ref: https://stackoverflow.com/questions/2811536/how-to-edit-a-maven-pom-at-runtime
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
 
@@ -238,6 +231,11 @@ public class RTSTester{
         writer.write(new FileOutputStream(new File(dir, "/pom.xml")), model);
     }
 
+    /**
+     * Patch STARTS dependencies in configuration file(pom.xml)
+     * @param dir: main directory of maven configuration file
+     * @throws IOException, XmlPullParserException
+     */
     private static void patchSTARTS(String dir) throws IOException, XmlPullParserException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
@@ -255,6 +253,11 @@ public class RTSTester{
         writer.write(new FileOutputStream(new File(dir, "/pom.xml")), model);
     }
 
+    /**
+     * Patch Evosuite dependencies in configuration file(pom.xml)
+     * @param dir: main directory of maven configuration file
+     * @throws IOException, XmlPullParserException
+     */
     static void patchEvosuite(String dir) throws IOException, XmlPullParserException, InterruptedException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
@@ -304,6 +307,11 @@ public class RTSTester{
         */
     }
 
+    /**
+     * Add dependencies to pom.xmls in multi-module project to ensure run order of modules.
+     * @param dir: main directory of maven configuration file
+     * @throws IOException, XmlPullParserException
+     */
     static void addParent(String dir) throws IOException, XmlPullParserException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
@@ -332,6 +340,12 @@ public class RTSTester{
         }
     }
 
+    /**
+     * Run test for the project and catch output, parse tests information.
+     * @param dir: main directory of maven configuration file
+     * @return TestResult Object to storing tests run and time used
+     * @throws IOException, InterruptedException
+     */
     static TestResult testAndLogResult(String dir) throws IOException, InterruptedException {
         long startTime = System.nanoTime();
         ProcessBuilder pb = new ProcessBuilder("mvn", "-f", dir + "/pom.xml", "test");
@@ -370,6 +384,11 @@ public class RTSTester{
         return new TestResult(testRun, duration);
     }
 
+    /**
+     * Parse test output for number of 'Tests run'
+     * @param line: String contains the information
+     * @return number of tests
+     */
     private static int getTestRun(String line) {
         int num = 0;
         for (int i = 0; i < line.length(); i++){
@@ -384,6 +403,12 @@ public class RTSTester{
         return num;
     }
 
+    /**
+     * Test if the project is multi-module maven project.
+     * @param dir: the path of module want to tested
+     * @return boolean if the project is multi-module
+     * @throws IOException, XmlPullParserException
+     */
     static boolean isMultiModule(String dir) throws IOException, XmlPullParserException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));

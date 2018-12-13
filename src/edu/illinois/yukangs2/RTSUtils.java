@@ -5,10 +5,17 @@ import java.util.*;
 
 public class RTSUtils {
     public static void main(String[] args) throws IOException {
-        List<BuildInfo> allBuilds = readCSV("filtered_info.csv");
+        String inputFile = "filtered_info.csv";
+        List<BuildInfo> allBuilds = readCSV(inputFile);
 
     }
 
+    /**
+     * read .csv file to get build information
+     * @param fileName path to input .csv file
+     * @return List of BuildInfo
+     * @throws FileNotFoundException .
+     */
     static List<BuildInfo> readCSV(String fileName) throws FileNotFoundException {
         List<BuildInfo> allBuilds = new ArrayList<>();
 
@@ -66,6 +73,11 @@ public class RTSUtils {
         return allBuilds;
     }
 
+    /**
+     * Filter input data to get most recent SHA from List of BuildInfo read from .csv
+     * @param allBuilds: List of BuildInfo
+     * @throws IOException
+     */
     static void filter_data(List<BuildInfo> allBuilds) throws IOException {
         HashMap<String, BuildInfo> selected = new HashMap<>();
 

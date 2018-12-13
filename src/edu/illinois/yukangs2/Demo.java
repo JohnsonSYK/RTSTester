@@ -15,6 +15,12 @@ public class Demo {
         RTSTester();
     }
 
+    /**
+     * For DEMO purpose during presentation
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws XmlPullParserException
+     */
     public static void RTSTester() throws IOException, InterruptedException, XmlPullParserException {
 
         //Set up repository
