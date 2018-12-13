@@ -16,153 +16,26 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import static edu.illinois.yukangs2.RTSUtils.*;
 
 public class RTSTester{
-    private final static int evaluationNum = 15;
-    private final static String repoURL = "https://github.com/JodaOrg/joda-time.git";
+    private static int evaluationNum;
+    private static String repoURL;
     private final static String domain = "https://github.com/";
     //https://github.com/kevinsawicki/http-request.git
     //https://github.com/JodaOrg/joda-time.git
 
-    /*
-         <plugin>
-        <groupId>org.ekstazi</groupId>
-        <artifactId>ekstazi-maven-plugin</artifactId>
-        <version>5.2.0</version>
-        <executions>
-          <execution>
-            <id>ekstazi</id>
-            <goals>
-              <goal>select</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-     */
-
-    /*
-    public static void RTSTester() throws IOException, InterruptedException, XmlPullParserException {
-
-        //Set up repository
-        initialize_Repo(repoURL);
-
-        //Get hashes for past evaluations
-        List<String> hashes = getHashes(evaluationNum);
-
-        //Add RTS dependency
-        patch_RTS(true);
-        for (int i = hashes.size()-1; i >= 0; i--) {
-            System.out.println("Testing commit " + i + " :" +hashes.get(i));
-
-            // Make modification to the code
-            update_Repo(hashes.get(i));
-
-            // Run test and collect dependencies
-            run_Test();
-        }
-    }
-    */
-
     public static void main(String[] args) throws IOException, InterruptedException, XmlPullParserException, TimeoutException {
-/*
-        String name = "temp";
-        runComm("rm -rf " + name);
-        File parent = createDir(name);
-        String dir = "./temp";
-
-        runComm("git clone " + repoURL + " " + dir);
-        patchAndTest(dir, true);
-        patchEvosuite(dir);
-        testAndLogResult(dir);
-*/
-/*
-        initialize_Repo(repoURL);
-        List<String> hashes = getHashes(evaluationNum);
-        patch_RTS(true);
-
-        for (int i = hashes.size()-1; i >= 0; i--) {
-            System.out.println("Testing commit " + i + " :" +hashes.get(i));
-            update_Repo(hashes.get(i));
-            run_Test();
+        if (args.length != 2){
+            System.out.println("Usage: RTSTester.java <num of evaluation> <repo url>");
+            System.exit(0);
         }
 
-        generate_Test(true);
-        run_Test();
-*/
-        List<BuildInfo> allBuilds = readCSV("filtered_info.csv");
+        evaluationNum = Integer.parseInt(args[0]);
+        repoURL = args[1];
 
-        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("out.csv", true)));
-
-        for (BuildInfo build : allBuilds){
-
-            Timer timer = new Timer(true);
-            /*
-            InterruptTimerTask interruptTimerTask =
-                    new InterruptTimerTask(Thread.currentThread());
-            timer.schedule(interruptTimerTask, 180000); //3 min
-            try {
-                runEval(build, pw);
-            } catch (InterruptedException e) {
-                pw.println(build.repoName+","+build.preSHA+","+build.curSHA+",NA,NA");
-                pw.flush();
-            } finally {
-                timer.cancel();
-            }
-            */
-            InterruptTimerTaskAddDel interruptTimerTask = new InterruptTimerTaskAddDel(
-                    Thread.currentThread(),180000);
-            timer.schedule(interruptTimerTask, 0);
-            try {
-                runEval(build, pw);
-            } catch (InterruptedException e) {
-                pw.println(build.repoName+","+build.preSHA+","+build.curSHA+",NA,NA");
-                pw.flush();
-            } finally {
-                timer.cancel();
-            }
-        }
-        pw.close();
-
-    }
-/*
-    protected static class InterruptTimerTask extends TimerTask {
-
-        private Thread theTread;
-
-        public InterruptTimerTask(Thread theTread) {
-            this.theTread = theTread;
-        }
-
-        @Override
-        public void run() {
-            theTread.interrupt();
-        }
-
-    }
-    */
-static class InterruptTimerTaskAddDel extends TimerTask {
-
-        private Thread theTread;
-        private long timeout;
-
-        public InterruptTimerTaskAddDel(Thread theTread,long i_timeout) {
-            this.theTread = theTread;
-            timeout=i_timeout;
-        }
-
-        @Override
-        public void run() {
-            try {
-                Thread.currentThread().sleep(timeout);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace(System.err);
-            }
-            theTread.interrupt();
-        }
+        runRTS();
 
     }
 
-    private static void runEval(BuildInfo build, PrintWriter pw) throws IOException, InterruptedException, XmlPullParserException {
+    static void runEval(BuildInfo build, PrintWriter pw) throws IOException, InterruptedException, XmlPullParserException {
         System.out.println("On repo: " + build.repoName + ", time: " + new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date()));
         //String name = "temp";
         String name = build.repoName.split("/")[1];
@@ -189,48 +62,35 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         runComm("rm -rf " + name);
         runComm("rm log.txt");
     }
-    /*
-    //------------------
-    private static TestResult run_Test() throws IOException, XmlPullParserException, InterruptedException {
+        /*
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter("out.csv", true)));
+
+        System.out.println("On repo: SonarSource/sonarqube");
+        String name = "temp";
+        runComm("rm -rf " + name);
+        File parent = createDir(name);
         String dir = "./temp";
-        File parent = new File("temp");
-        if (isMultiModule(dir))
-            addParent(dir);
-        patchEkstazi(dir);
-        TestResult res = testAndLogResult("./temp");
+        runComm("git clone " + domain+"SonarSource/sonarqube.git" + " " + dir);
+        runComm("git checkout " + "10d02b48362808b6f109d41f5a29380778f919b8", parent);
+        TestResult pre = patchAndTest(dir, true);
         runComm("git checkout .", parent);
-        return res;
-    }
-
-    private static void patch_RTS(boolean isEkstazi) throws IOException, XmlPullParserException, InterruptedException {
-
-    }
-
-    private static void generate_Test(boolean isEvosuite) throws IOException, XmlPullParserException, InterruptedException {
-        patchEvosuite("./temp");
-    }
-
-    private static void update_Repo(String input) throws IOException, InterruptedException {
-        File dir = new File("temp");
-        runComm("git checkout " + input, dir);
-    }
-
-    private static void initialize_Repo(String url) throws IOException, InterruptedException {
-        runComm("rm -rf ./temp");
-        runComm("git clone " + url + " ./temp");
-    }
-    //------------------
-    */
+        runComm("git checkout " + "ff3a016e7896ead2a5387c88c152032097b7b475", parent);
+        TestResult res = patchAndTest(dir, true);
+        System.out.println("Testing Build " + 73345909 + " and select " +res.testRun +" tests out of " + pre.testRun + " tests.");
+        pw.println(pre.testRun+","+res.testRun);
+        //runComm("rm -rf " + name);
+        pw.flush();
+        */
 
     private static void runRTS() throws IOException, InterruptedException, XmlPullParserException {
         /*
-            1. create temp dir, move into temp *
-            2. clone repo *
-            3. move into main dir -
-            4. Add Ekstazi to pom.xml *
-            5. run RTS tool *
-            6. save result *
-            7. clear temp dir *
+            1. create temp dir, move into temp
+            2. clone repo
+            3. move into main dir
+            4. Add Ekstazi to pom.xml
+            5. run RTS tool
+            6. save result
+            7. clear temp dir
         */
 
         String name = "temp";
@@ -241,7 +101,16 @@ static class InterruptTimerTaskAddDel extends TimerTask {
 
         runComm("git clone " + repoURL + " " + dir);
 
-
+        /*
+        List<String> testingHashes = new ArrayList<>();
+        hashes.add("2d62a3e9da726942a93cf16b6e91c0187e6c0136"); // latest
+        hashes.add("405c3fe77795bb426f97bf9f63aa7573ce6f64fb"); // 6.0
+        hashes.add("4ddfba9a04c9f6ff381288b73ed1c05a1e5b7638"); // 5.0
+        hashes.add("717665ff188292f13ce4e7d216fe258e80b0e05c"); // 4.0
+        hashes.add("777832d46a9639df85648aebcbfa2d970cc67742"); // 3.0
+        hashes.add("568196a8d1e993eb33c0d784acc83f93fdea71e2"); // 2.0
+        hashes.add("64c8ebfda9d49265730f30f56eec346ed14bf74d"); // 1.0
+        */
         List hashes = getHashes(evaluationNum, dir);
         double sumTests = 0;
         double maxDuration = -1;
@@ -274,7 +143,7 @@ static class InterruptTimerTaskAddDel extends TimerTask {
 
     }
 
-    private static List<String> getHashes(int num, String dir) throws IOException {
+    static List<String> getHashes(int num, String dir) throws IOException {
         ProcessBuilder pb = new ProcessBuilder("git", "--git-dir="+dir+"/.git", "log", "-" + num, "--format=\"%H\"");
         Process p = pb.start();
         //p.waitFor();
@@ -288,7 +157,7 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         return hashes;
     }
 
-    private static TestResult patchAndTest(String dir, boolean isEkstazi) throws IOException, XmlPullParserException, InterruptedException {
+    static TestResult patchAndTest(String dir, boolean isEkstazi) throws IOException, XmlPullParserException, InterruptedException {
         if (isMultiModule(dir))
             addParent(dir);
         if (isEkstazi)
@@ -299,19 +168,19 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         return testAndLogResult(dir);
     }
 
-    private static void runComm(String com) throws IOException, InterruptedException {
+    static void runComm(String com) throws IOException, InterruptedException {
         Runtime rt = Runtime.getRuntime();
         Process pr = rt.exec(com);
         pr.waitFor();
     }
 
-    private static void runComm(String com, File dir) throws InterruptedException, IOException {
+    static void runComm(String com, File dir) throws InterruptedException, IOException {
         Runtime rt = Runtime.getRuntime();
         Process pr = rt.exec(com, null, dir);
         pr.waitFor();
     }
 
-    private static File createDir(String name){
+    static File createDir(String name){
         File dir = new File(name);
         if (!dir.mkdir()) {
             System.out.print("Temp directory already exist!");
@@ -330,7 +199,22 @@ static class InterruptTimerTaskAddDel extends TimerTask {
     }
 
     //https://stackoverflow.com/questions/2811536/how-to-edit-a-maven-pom-at-runtime
-    private static void patchEkstazi(String dir) throws IOException, XmlPullParserException {
+    /*
+      <plugin>
+        <groupId>org.ekstazi</groupId>
+        <artifactId>ekstazi-maven-plugin</artifactId>
+        <version>5.2.0</version>
+        <executions>
+          <execution>
+            <id>ekstazi</id>
+            <goals>
+              <goal>select</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    */
+    static void patchEkstazi(String dir) throws IOException, XmlPullParserException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
 
@@ -371,7 +255,7 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         writer.write(new FileOutputStream(new File(dir, "/pom.xml")), model);
     }
 
-    private static void patchEvosuite(String dir) throws IOException, XmlPullParserException, InterruptedException {
+    static void patchEvosuite(String dir) throws IOException, XmlPullParserException, InterruptedException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
 
@@ -399,17 +283,17 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         dependency.setVersion("1.0.6");
         dependency.setScope("test");
         model.addDependency(dependency);
-        /*
+
         Repository rep = new Repository();
         rep.setId("EvoSuite");
         rep.setName("EvoSuite Repository");
         rep.setUrl("http://www.evosuite.org/m2");
         model.addRepository(rep);
-        */
 
         MavenXpp3Writer writer = new MavenXpp3Writer();
         writer.write(new FileOutputStream(new File(dir, "/pom.xml")), model);
 
+        /*
         Model model2 = reader.read(new FileInputStream(new File(dir+"/lib", "/pom.xml")));
         model2.getBuild().addPlugin(plugin2);
         writer.write(new FileOutputStream(new File(dir+"/lib", "/pom.xml")), model2);
@@ -417,9 +301,10 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         File parent = new File(dir);
         runComm("mvn evosuite:generate", parent);
         runComm("mvn evosuite:export", parent);
+        */
     }
 
-    private static void addParent(String dir) throws IOException, XmlPullParserException {
+    static void addParent(String dir) throws IOException, XmlPullParserException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
         String parentGID = model.getGroupId();
@@ -447,7 +332,7 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         }
     }
 
-    private static TestResult testAndLogResult(String dir) throws IOException, InterruptedException {
+    static TestResult testAndLogResult(String dir) throws IOException, InterruptedException {
         long startTime = System.nanoTime();
         ProcessBuilder pb = new ProcessBuilder("mvn", "-f", dir + "/pom.xml", "test");
         Process p = pb.start();
@@ -499,7 +384,7 @@ static class InterruptTimerTaskAddDel extends TimerTask {
         return num;
     }
 
-    private static boolean isMultiModule(String dir) throws IOException, XmlPullParserException {
+    static boolean isMultiModule(String dir) throws IOException, XmlPullParserException {
         MavenXpp3Reader reader = new MavenXpp3Reader();
         Model model = reader.read(new FileInputStream(new File(dir, "/pom.xml")));
 
