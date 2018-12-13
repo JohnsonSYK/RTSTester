@@ -11,7 +11,7 @@ There are a lot of RTS tools available, RTS Tester integrate two most popular RT
 ### RTS Tools used:  
 1. **Ekstazi**: State-of-the-art dynamic class-level RTS tool.  
 http://ekstazi.org/  
-<img width = "200" alt="ekstazi" src = "https://user-images.githubusercontent.com/16890520/49922646-ef594080-fe76-11e8-88ad-cb85db260ad8.png">
+<img align="right" width = "200" alt="ekstazi" src = "https://user-images.githubusercontent.com/16890520/49922646-ef594080-fe76-11e8-88ad-cb85db260ad8.png">
 
 2. **STARTS**: Static class-level RTS tool.  
 https://github.com/TestingResearchIllinois/starts  
@@ -20,11 +20,11 @@ https://github.com/TestingResearchIllinois/starts
 
 1. **Evosuite**: Search-based unit test generation.  
 http://www.evosuite.org/      
- <img width="201" alt="1" src="https://user-images.githubusercontent.com/16890520/49931344-474e7200-fe8c-11e8-8199-dc043eb26c95.PNG">
+ <img align="right" width="201" alt="1" src="https://user-images.githubusercontent.com/16890520/49931344-474e7200-fe8c-11e8-8199-dc043eb26c95.PNG">
 
 2. **Randoop**: Random unit test generation.  
 https://randoop.github.io/randoop/   
-<img width="293" alt="2" src="https://user-images.githubusercontent.com/16890520/49931345-474e7200-fe8c-11e8-9693-82748fa65b22.PNG">
+<img align="right" width="293" alt="2" src="https://user-images.githubusercontent.com/16890520/49931345-474e7200-fe8c-11e8-9693-82748fa65b22.PNG">
 
 
   
