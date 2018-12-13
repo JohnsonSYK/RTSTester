@@ -11,6 +11,7 @@ There are a lot of RTS tools available, RTS Tester integrate two most popular RT
 ### RTS Tools used:  
 1. **Ekstazi**: State-of-the-art dynamic class-level RTS tool.  
 http://ekstazi.org/  
+<img width = "200" alt="ekstazi" src = "https://user-images.githubusercontent.com/16890520/49922646-ef594080-fe76-11e8-88ad-cb85db260ad8.png">
 2. **STARTS**: Static class-level RTS tool.  
 https://github.com/TestingResearchIllinois/starts  
 ## Getting Started  
@@ -22,7 +23,8 @@ These instructions will get you a copy of the RTS Tester up and running on your 
 Things you need to prepare before using RTS Tester.  
   
 ```  
-1. A github open source project you want to test. 2. Java JDK 8.  
+1. A github open source project you want to test.
+2. Java JDK 8.  
 3. IDE (Optional but recommended Intellij)  
 ```  
 Note: RTS Tester works on both single and multi module maven projects. However, projects that require specific configuration to compile may not work properly.  
@@ -60,9 +62,14 @@ Open RTSTester.java under src.edu.illinois.yukangs2 directory, manually setting 
   
 ```  
 public static void main(String[] args) throws ... {  
- ... evaluationNum = 100; repoURL = "https://github.com/JodaOrg/joda-time.git"; runRTS();}  
+    ... 
+    evaluationNum = 100;
+    repoURL = "https://github.com/JodaOrg/joda-time.git";
+    runRTS();
+ }  
 ```  
-  
+There is the default test flow for RTS Tester, if you want to customize your test flow, go next session:
+<img width="809" alt="capture" src="https://user-images.githubusercontent.com/16890520/49922648-eff1d700-fe76-11e8-9c2e-fda7ab778c42.PNG">
 ## Customize Tests  
   
 * **Methods:**  
@@ -127,7 +134,10 @@ testAndLogResult(path);
 ## Testing Results:
 
 You can checkout some of the test results using this tool [here](https://github.com/JohnsonSYK/RTSTester/blob/master/Results.MD).
-  
+
+## Testing Pipeline:
+Developers could integrate RTS Tester to achieve following part to better test their build before deployment: 
+<img width="799" alt="capture2" src="https://user-images.githubusercontent.com/16890520/49922647-ef594080-fe76-11e8-8aa1-e999e6c6e946.PNG">
 
 ## Development Plan  
 * Improve RTS Tester stability and compatibility.  
