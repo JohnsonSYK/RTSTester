@@ -126,7 +126,7 @@ testAndLogResult(path);
 ```  
 ## Testing Results:
 
-You can access part of the test results using this tool [here](https://github.com/JohnsonSYK/RTSTester/blob/master/Results.MD).
+You can checkout some of the test results using this tool [here](https://github.com/JohnsonSYK/RTSTester/blob/master/Results.MD).
   
 
 ## Development Plan  

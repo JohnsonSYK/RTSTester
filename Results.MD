@@ -1,8 +1,10 @@
 # Testing Results for RTS Tester
-###RTS Tools Evaluation:
-I tested my tool on the following projects over 100 SHAs with Ekstazi, and here are the results:
 
-| | Tests w/o RTS | Tests w/ RTS |%Tests selected | Time w/o RTS(s) |  Time w/ RTS(s) | %Time used |
+* RTS Tools Evaluation:
+
+I tested my tool on the following projects with Ekstazi over 100 SHAs, and here are the results:
+
+| | Tests w/o RTS[<sup>1</sup>](#1) | Tests w/ RTS |%Tests selected | Time w/o RTS(s)[<sup>2</sup>](#2) |  Time w/ RTS(s) | %Time used |
 | :---:        |     :---:      |         :---: |  :---:|  :---:|  :---:| :---:|
 | perwendel/spark   |   302  |  73.4   | 24.3% | 78.6| 22| 27.98%|
 | jhy/jsoup     |    668    |    478.86   | 71.56%|11.65 |9.5 | 81.52|
@@ -14,15 +16,16 @@ I tested my tool on the following projects over 100 SHAs with Ekstazi, and here 
 | iTrust    |     847.5   |   143    | 16.9%| 34.9|13.6 | 39%|
 | larsga/Duke    |   662     |  115    |17.37% |72 |25 | 34.7%|
 
+<a>1</a>: Average number of tests run without RTS tools.
+
+<a>2</a>: Average runtime of test suite without RTS tools
 
 
-
-
-###Test Generation:
+* Test Generation:
 
 I tested my tool on the following projects with Evosuite, and here are the results:
 
-| | #Tests (before) | #Tests (after)  | Test generated | Coverage (before) | Coverage(after) | Improvement |
+| | #Tests (before)[<sup>3</sup>](#3) | #Tests (after)  | Test generated | Coverage (before)[<sup>4</sup>](#4) | Coverage(after) | Improvement |
 | :---:        |     :---:      |         :---: |  :---:|  :---:|  :---:| :---:|
 | perwendel/spark   |   304  |  1637   | 1333 | 68%| 72%| 4%|
 | jhy/jsoup     |    669    |   3101   | 2432|84% |84% |0%|
@@ -32,3 +35,7 @@ I tested my tool on the following projects with Evosuite, and here are the resul
 | apache/pdfbox    |  1633  |  2092    |459|95% |95% | 0%|
 | vipshop/vjtools   |   221     |   758  |537 |90% | 92%|2% |
 | openmrs-core   |     0   |   16    | 16| 0%|79% | 79%|
+
+<a>3</a>: Number of tests before generation.
+
+<a>4</a>: Overall test coverage of project through jacoco report.
