@@ -7,7 +7,7 @@
   
 When developers maintain a software, they often create test suite on main functionalities and periodically regression test their build on test suite to make sure their changes do not produce errors. The simplest regression testing strategy, *retest all*, reruns every test case in the test suite. However this strategy can be very expensive as the scale of test suite and software grows. Here comes another approach, *regression test selection (RTS)*, reruns only a subset of the initial test suite. Studies show that a good selection tool could significantly reduce the testing time through skipping tests that are unaffected by the changes developers made.   
   
-There are a lot of RTS tools available, RTS Tester integrate two most popular RTS tools and let developer easily experiment their project with RTS tools over hundreds of builds. RTS Tester also provide environment to let developer customize their own testing flow. Including integration of *Evosuite*, an unit test generation tool for maven projects.  
+There are a lot of RTS tools available, RTS Tester integrate two most popular RTS tools and let developer easily experiment their project with RTS tools over hundreds of builds. RTS Tester also provide environment to let developer customize their own testing flow. Including integration of *Evosuite* and *Randoop*, two unit test generation tools for maven projects.  
 ### RTS Tools used:  
 1. **Ekstazi**: State-of-the-art dynamic class-level RTS tool.  
 http://ekstazi.org/  
@@ -16,7 +16,18 @@ http://ekstazi.org/
 2. **STARTS**: Static class-level RTS tool.  
 https://github.com/TestingResearchIllinois/starts  
 
+### Test Generation Tools used:
 
+1. **Evosuite**: Search-based unit test generation.  
+http://www.evosuite.org/      
+ <img width="201" alt="1" src="https://user-images.githubusercontent.com/16890520/49931344-474e7200-fe8c-11e8-8199-dc043eb26c95.PNG">
+
+2. **Randoop**: Random unit test generation.  
+https://randoop.github.io/randoop/   
+<img width="293" alt="2" src="https://user-images.githubusercontent.com/16890520/49931345-474e7200-fe8c-11e8-9693-82748fa65b22.PNG">
+
+
+  
 ## Getting Started  
   
 These instructions will get you a copy of the RTS Tester up and running on your local machine for development and testing purposes.   
@@ -96,7 +107,8 @@ project name, build id, event type, previous SHA, current SHA
 8. ```patchEkstazi() ```: add *Ekstazi* dependency to ```pom.xml```.  
 9. ```patchSTARTS() ```: add *STARTS* dependency to ```pom.xml```.  
 10. ```patchEvosuite() ```: add *Evosuite* dependency to ```pom.xml```.  
-11. ```testAndLogResult()```:   run test and log result, return ```TestResult``` Object.  
+11. ```patchRandoop() ```: add *Randoop* dependency to ```pom.xml```.  
+12. ```testAndLogResult()```:   run test and log result, return ```TestResult``` Object.  
 * **Classes:**  
 1. **BuildInfo**: contains data  
 ```  
