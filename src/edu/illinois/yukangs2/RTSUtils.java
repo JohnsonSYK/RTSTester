@@ -1,12 +1,14 @@
 package edu.illinois.yukangs2;
 
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.*;
 
 public class RTSUtils {
     public static void main(String[] args) throws IOException {
-        String inputFile = "filtered_info.csv";
-        List<BuildInfo> allBuilds = readCSV(inputFile);
+        List<String[]> hash = parseIn("./final/in.csv");
+
 
     }
 
@@ -71,6 +73,108 @@ public class RTSUtils {
         scanner.close();
 
         return allBuilds;
+    }
+
+    private static Set<String> parse164Out(String path) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File(path));
+        Set<String> res = new HashSet<>();
+        while (scanner.hasNextLine()){
+            String s = scanner.nextLine();
+            String[] parts = s.split(",");
+            res.add(parts[2]);
+        }
+        scanner.close();
+        return res;
+    }
+
+    private static List<String[]> parseIn(String path) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File(path));
+        List<String[]> res = new ArrayList<>();
+        while (scanner.hasNextLine()){
+            String s = scanner.nextLine();
+            String[] parts = s.split(",");
+            res.add(new String[]{parts[1], parts[2]});
+        }
+        scanner.close();
+        return res;
+    }
+
+    private static void removeQuotationMark(String path) throws FileNotFoundException {
+        File file = new File(path);  // create File object to read from
+        Scanner scanner = new Scanner(file);       // create scanner to read
+        PrintWriter writer = new PrintWriter("out RemoveQuotationMark.csv"); // create file to write to
+
+        while(scanner.hasNextLine()){  // while there is a next line
+            String line = scanner.nextLine();  // line = that next line
+
+            // do something with that line
+            StringBuilder newLine = new StringBuilder();
+
+            // replace a character
+            for (int i = 0; i < line.length(); i++){
+                if (line.charAt(i) != '\"') {  // or anything other character you chose
+                    newLine.append(line.charAt(i));
+                }
+            }
+
+            // print to another file.
+            writer.println(newLine.toString());
+            writer.flush();
+
+        }
+        writer.close();
+    }
+
+    private static void downloadZip(String hash, String name){
+        URL url;
+        URLConnection con;
+        DataInputStream dis;
+        FileOutputStream fos;
+        byte[] fileData;
+        try {
+            url = new URL("http://168.61.190.96:8080/external/prevfiledumps/"+hash+"/dump.zip"); //File Location goes here
+            con = url.openConnection(); // open the url connection.
+            dis = new DataInputStream(con.getInputStream());
+            fileData = new byte[con.getContentLength()];
+            for (int q = 0; q < fileData.length; q++) {
+                fileData[q] = dis.readByte();
+            }
+            dis.close(); // close the data input stream
+            fos = new FileOutputStream(new File("./final/"+name+".zip")); //FILE Save Location goes here
+            fos.write(fileData);  // write out the file we want to save.
+            fos.close(); // close the output stream writer
+        }
+        catch(Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    private static void mergeOut() throws IOException {
+        List<BuildInfo> allBuilds = readCSV("verboseInfo.csv");
+        System.out.println(allBuilds.size());
+        Set<String> seen = parse164Out("out.csv");
+        System.out.println(seen.size());
+
+        Map<String, String> nameFromHash = new HashMap<>();
+        for (BuildInfo b : allBuilds){
+            nameFromHash.put(b.curSHA, b.repoName);
+        }
+
+        PrintWriter printTo = new PrintWriter(new BufferedWriter(new FileWriter("out merge.csv", true)));
+        Scanner infoFrom = new Scanner(new File("./Achieved Files/out 12.6.csv"));
+
+        while (infoFrom.hasNextLine()){
+            String s = infoFrom.nextLine();
+            String[] parts = s.split(",");
+            if (seen.contains(parts[1])) {
+                System.out.println("seen: " + parts[1]);
+                continue;
+            }
+            printTo.append(nameFromHash.get(parts[1])).append(",").append(s).append(",old").append("\n");
+            printTo.flush();
+        }
+        printTo.close();
+        infoFrom.close();
     }
 
     /**
